@@ -1,7 +1,5 @@
 import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { login } from "../../actions/user";
 import "./Login.css";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../actions/user";
