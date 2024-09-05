@@ -1,7 +1,6 @@
 import React from 'react';
 import { ReactNavbar } from 'overlay-navbar'; // Ensure the library is properly installed
 import logo from '../../Images/logo (1).png';
-// import { FaUser } from "react-icons/fa"; // Test with a different icon
 import { FaUserAlt } from 'react-icons/fa'; // Correct import path
 const Header = () => {
   return (

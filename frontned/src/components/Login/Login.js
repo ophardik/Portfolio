@@ -3,14 +3,13 @@ import React, { useEffect, useState } from "react";
 import "./Login.css";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../actions/user";
- import { useAlert } from "react-alert";
+import { toast } from "react-toastify"; // Import toast from react-toastify
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-   const dispatch = useDispatch();
-  const alert = useAlert();
+  const dispatch = useDispatch();
   const { loading, message, error } = useSelector((state) => state.login);
 
   const submitHandler = (e) => {
@@ -20,15 +19,16 @@ const Login = () => {
 
   useEffect(() => {
     if (error) {
-      alert.error(error);
+      toast.error(error); // Use toast.error for errors
       dispatch({ type: "CLEAR_ERRORS" });
     }
     if (message) {
-      alert.success(message);
+      toast.success(message); // Use toast.success for success messages
       dispatch({ type: "CLEAR_MESSAGE" });
     }
-  }, [alert, error, message, dispatch]);
-  console.log("logged In successfully")
+  }, [error, message, dispatch]);
+
+  console.log("logged In successfully");
 
   return (
     <div className="login">
@@ -63,9 +63,7 @@ const Login = () => {
               required
               onChange={(e) => setPassword(e.target.value)}
             />
-            <Button type="submit" variant="contained" 
-            disabled={loading} 
-            >
+            <Button type="submit" variant="contained" disabled={loading}>
               Login
             </Button>
           </div>

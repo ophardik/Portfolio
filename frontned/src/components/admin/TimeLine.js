@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { useAlert } from "react-alert";
 import { useDispatch, useSelector } from "react-redux";
 import { addTimeline, deleteTimeline, getUser } from "../../actions/user";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Timeline = () => {
   const { message, error, loading } = useSelector((state) => state.update);
-  
   const { message: loginMessage } = useSelector((state) => state.login);
   const { user } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-  const alert = useAlert();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -22,46 +21,39 @@ const Timeline = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    await dispatch(addTimeline(title, description, date));
-    console.log(title, description, date)
-    dispatch(getUser());
-  };
-
-
-  
-  const deleteHandler = async (id) => {
     try {
-      console.log("deleteHandler called with id:", id);
-
-      // Check if id is undefined and add a guard clause
-      // if (!id) {
-      //   console.error("ID is undefined, cannot proceed with deletion.");
-      //   return;
-      // }
-      await dispatch(deleteTimeline(id)); // Dispatch delete action
-      console.log("id",id)
-      await dispatch(getUser()); // Re-fetch updated user data
-      console.log("deleted")
+      await dispatch(addTimeline(title, description, date));
+      toast.success("Timeline added successfully!");
+      dispatch(getUser());
     } catch (error) {
-      console.error("Error deleting timeline:", error);
+      toast.error("Failed to add timeline.");
     }
   };
-  
+
+  const deleteHandler = async (id) => {
+    try {
+      await dispatch(deleteTimeline(id));
+      toast.success("Timeline deleted successfully!");
+      dispatch(getUser());
+    } catch (error) {
+      toast.error("Failed to delete timeline.");
+    }
+  };
+
   useEffect(() => {
     if (error) {
-      alert.error(error);
+      toast.error(error);
       dispatch({ type: "CLEAR_ERRORS" });
     }
     if (message) {
-      alert.success(message);
+      toast.success(message);
       dispatch({ type: "CLEAR_MESSAGE" });
     }
-
     if (loginMessage) {
-      alert.success(loginMessage);
+      toast.success(loginMessage);
       dispatch({ type: "CLEAR_MESSAGE" });
     }
-  }, [alert, error, message, dispatch, loginMessage]);
+  }, [error, message, dispatch, loginMessage]);
 
   return (
     <div className="adminPanel">
@@ -113,33 +105,31 @@ const Timeline = () => {
         </form>
 
         <div className="adminPanelTimeline">
-  {user &&
-    user.timeline &&
-    user.timeline.map((item, index) => (
-      <div className="timelineCard" key={item._id || index}>
-        <Typography variant="h6">{item.title}</Typography>
-        <Typography variant="body1" style={{ letterSpacing: "2px" }}>
-          {item.description}
-        </Typography>
-        <Typography variant="body1" style={{ fontWeight: 600 }}>
-          {item.date.toString().split("T")[0]}
-        </Typography>
+          {user &&
+            user.timeline &&
+            user.timeline.map((item, index) => (
+              <div className="timelineCard" key={item._id || index}>
+                <Typography variant="h6">{item.title}</Typography>
+                <Typography variant="body1" style={{ letterSpacing: "2px" }}>
+                  {item.description}
+                </Typography>
+                <Typography variant="body1" style={{ fontWeight: 600 }}>
+                  {item.date.toString().split("T")[0]}
+                </Typography>
 
-        <Button
-          style={{
-            margin: "auto",
-            display: "block",
-            color: "rgba(40,40,40,0.7)",
-          }}
-          onClick={() => deleteHandler(item._id)}
-        >
-          <FaTrash />
-        </Button>
-      </div>
-    ))}
-</div>
-
-
+                <Button
+                  style={{
+                    margin: "auto",
+                    display: "block",
+                    color: "rgba(40,40,40,0.7)",
+                  }}
+                  onClick={() => deleteHandler(item._id)}
+                >
+                  <FaTrash />
+                </Button>
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );

@@ -2,16 +2,15 @@ import React, { useEffect, useState } from "react";
 import "./AdminPanel.css";
 import { Button, Typography } from "@mui/material";
 import { AiOutlineProject } from "react-icons/ai";
-import { FaYoutube } from "react-icons/fa";
 import { MdTimeline } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
- import { logout, updateUser } from "../../actions/user";
-import { useAlert } from "react-alert";
+import { logout, updateUser } from "../../actions/user";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminPanel = () => {
   const dispatch = useDispatch();
-  const alert = useAlert();
 
   const { message: loginMessage } = useSelector((state) => state.login);
   const { message, error, loading } = useSelector((state) => state.update);
@@ -24,13 +23,12 @@ const AdminPanel = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-     dispatch(updateUser(name, email, password, skills, about));
-
+    dispatch(updateUser(name, email, password, skills, about));
     console.log(name, email, password, skills, about);
   };
 
   const logoutHandler = () => {
-     dispatch(logout());
+    dispatch(logout());
   };
 
   const handleAboutImage = (e) => {
@@ -54,42 +52,28 @@ const AdminPanel = () => {
 
     Reader.onload = () => {
       if (Reader.readyState === 2) {
-        if (val === 1) {
-          setSkills({ ...skills, image1: Reader.result });
-        }
-        if (val === 2) {
-          setSkills({ ...skills, image2: Reader.result });
-        }
-        if (val === 3) {
-          setSkills({ ...skills, image3: Reader.result });
-        }
-        if (val === 4) {
-          setSkills({ ...skills, image4: Reader.result });
-        }
-        if (val === 5) {
-          setSkills({ ...skills, image5: Reader.result });
-        }
-        if (val === 6) {
-          setSkills({ ...skills, image6: Reader.result });
-        }
+        setSkills((prevSkills) => ({
+          ...prevSkills,
+          [`image${val}`]: Reader.result
+        }));
       }
     };
   };
 
   useEffect(() => {
     if (error) {
-      alert.error(error);
+      toast.error(error);
       dispatch({ type: "CLEAR_ERRORS" });
     }
     if (message) {
-      alert.success(message);
+      toast.success(message);
       dispatch({ type: "CLEAR_MESSAGE" });
     }
     if (loginMessage) {
-      alert.success(loginMessage);
+      toast.success(loginMessage);
       dispatch({ type: "CLEAR_MESSAGE" });
     }
-  }, [alert, error, message, dispatch, loginMessage]);
+  }, [error, message, dispatch, loginMessage]);
 
   return (
     <div className="adminPanel">
@@ -132,65 +116,17 @@ const AdminPanel = () => {
           />
 
           <div className="adminPanelSkill">
-            <div>
-              <Typography>SKILL 1</Typography>
-              <input
-                className="adminPanelFileUpload"
-                type="file"
-                onChange={(e) => handleImages(e, 1)}
-                accept="image/*"
-              />
-            </div>
-            <div>
-              <Typography>SKILL 2</Typography>
-
-              <input
-                type="file"
-                onChange={(e) => handleImages(e, 2)}
-                accept="image/*"
-                className="adminPanelFileUpload"
-              />
-            </div>
-            <div>
-              <Typography>SKILL 3</Typography>
-
-              <input
-                type="file"
-                onChange={(e) => handleImages(e, 3)}
-                accept="image/*"
-                className="adminPanelFileUpload"
-              />
-            </div>
-            <div>
-              <Typography>SKILL 4</Typography>
-
-              <input
-                type="file"
-                onChange={(e) => handleImages(e, 4)}
-                accept="image/*"
-                className="adminPanelFileUpload"
-              />
-            </div>
-            <div>
-              <Typography>SKILL 5</Typography>
-
-              <input
-                type="file"
-                onChange={(e) => handleImages(e, 5)}
-                accept="image/*"
-                className="adminPanelFileUpload"
-              />
-            </div>
-            <div>
-              <Typography>SKILL 6</Typography>
-
-              <input
-                type="file"
-                onChange={(e) => handleImages(e, 6)}
-                accept="image/*"
-                className="adminPanelFileUpload"
-              />
-            </div>
+            {[1, 2, 3, 4, 5, 6].map((index) => (
+              <div key={index}>
+                <Typography>SKILL {index}</Typography>
+                <input
+                  type="file"
+                  onChange={(e) => handleImages(e, index)}
+                  accept="image/*"
+                  className="adminPanelFileUpload"
+                />
+              </div>
+            ))}
           </div>
 
           <div className="adminPanelAbout">
@@ -199,39 +135,35 @@ const AdminPanel = () => {
               <input
                 type="text"
                 placeholder="Name"
-                value={about.name}
+                value={about.name || ""}
                 onChange={(e) => setAbout({ ...about, name: e.target.value })}
                 className="adminPanelInputs"
               />
               <input
                 type="text"
                 placeholder="Title"
-                value={about.title}
+                value={about.title || ""}
                 onChange={(e) => setAbout({ ...about, title: e.target.value })}
                 className="adminPanelInputs"
               />
               <input
                 type="text"
                 placeholder="Subtitle"
-                value={about.subtitle}
-                onChange={(e) =>
-                  setAbout({ ...about, subtitle: e.target.value })
-                }
+                value={about.subtitle || ""}
+                onChange={(e) => setAbout({ ...about, subtitle: e.target.value })}
                 className="adminPanelInputs"
               />
               <input
                 type="text"
                 placeholder="Description"
-                value={about.description}
-                onChange={(e) =>
-                  setAbout({ ...about, description: e.target.value })
-                }
+                value={about.description || ""}
+                onChange={(e) => setAbout({ ...about, description: e.target.value })}
                 className="adminPanelInputs"
               />
               <input
                 type="text"
                 placeholder="Quote"
-                value={about.quote}
+                value={about.quote || ""}
                 onChange={(e) => setAbout({ ...about, quote: e.target.value })}
                 className="adminPanelInputs"
               />
@@ -240,7 +172,6 @@ const AdminPanel = () => {
                 type="file"
                 onChange={handleAboutImage}
                 className="adminPanelFileUpload"
-                placeholder="Choose Avatar"
                 accept="image/*"
               />
             </fieldset>
@@ -253,7 +184,7 @@ const AdminPanel = () => {
             PROJECTS <AiOutlineProject />
           </Link>
 
-          <Button type="submit" variant="contained"  disabled={loading}>
+          <Button type="submit" variant="contained" disabled={loading}>
             Update
           </Button>
         </form>
@@ -267,6 +198,7 @@ const AdminPanel = () => {
           LOGOUT
         </Button>
       </div>
+      <ToastContainer />
     </div>
   );
 };

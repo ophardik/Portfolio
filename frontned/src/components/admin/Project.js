@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useAlert } from "react-alert";
 import { useDispatch, useSelector } from "react-redux";
 import { addProject, getUser } from "../../actions/user";
 import { MdKeyboardBackspace } from "react-icons/md";
 import { Button, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import { ProjectCard } from "../Projects/Project";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Project = () => {
   const cardRef = useRef(null);
@@ -15,13 +16,12 @@ const Project = () => {
       cardRef.current.style.backgroundColor = 'lightblue'; // Example style change
     }
   }, []);
+
   const { message, error, loading } = useSelector((state) => state.update);
   const { message: loginMessage } = useSelector((state) => state.login);
-
   const { user } = useSelector((state) => state.user);
 
   const dispatch = useDispatch();
-  const alert = useAlert();
 
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
@@ -31,8 +31,13 @@ const Project = () => {
 
   const submitHandler = async (e) => {
     e.preventDefault();
-    await dispatch(addProject(title, url, image, description, techStack));
-    dispatch(getUser());
+    try {
+      await dispatch(addProject(title, url, image, description, techStack));
+      toast.success("Project added successfully!");
+      dispatch(getUser());
+    } catch (error) {
+      toast.error("Failed to add project.");
+    }
   };
 
   const handleImage = (e) => {
@@ -50,18 +55,18 @@ const Project = () => {
 
   useEffect(() => {
     if (error) {
-      alert.error(error);
+      toast.error(error);
       dispatch({ type: "CLEAR_ERRORS" });
     }
     if (message) {
-      alert.success(message);
+      toast.success(message);
       dispatch({ type: "CLEAR_MESSAGE" });
     }
     if (loginMessage) {
-      alert.success(loginMessage);
+      toast.success(loginMessage);
       dispatch({ type: "CLEAR_MESSAGE" });
     }
-  }, [alert, error, message, dispatch, loginMessage]);
+  }, [error, message, dispatch, loginMessage]);
 
   return (
     <div className="adminPanel">

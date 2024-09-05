@@ -2,7 +2,7 @@ import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./Contact.css";
-import { useAlert } from "react-alert";
+import { toast } from "react-toastify"; // Import toast from react-toastify
 import { contactUs } from "../../actions/user";
 
 const Contact = () => {
@@ -10,13 +10,8 @@ const Contact = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const dispatch = useDispatch();
-  const alert = useAlert();
 
-  const {
-    loading,
-    message: alertMessage,
-    error,
-  } = useSelector((state) => state.update);
+  const { loading, message: alertMessage, error } = useSelector((state) => state.update);
 
   const contactFormHandler = (e) => {
     e.preventDefault();
@@ -25,14 +20,14 @@ const Contact = () => {
 
   useEffect(() => {
     if (error) {
-      alert.error(error);
+      toast.error(error); // Use toast.error for errors
       dispatch({ type: "CLEAR_ERRORS" });
     }
     if (alertMessage) {
-      alert.success(alertMessage);
+      toast.success(alertMessage); // Use toast.success for success messages
       dispatch({ type: "CLEAR_MESSAGE" });
     }
-  }, [alert, error, alertMessage, dispatch]);
+  }, [error, alertMessage, dispatch]);
 
   return (
     <div className="contact">
@@ -65,9 +60,7 @@ const Contact = () => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           ></textarea>
-          <Button variant="contained" type="submit" 
-          disabled={loading} 
-           >
+          <Button variant="contained" type="submit" disabled={loading}>
             Send
           </Button>
         </form>
